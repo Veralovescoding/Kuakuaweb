@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>my_ai_project</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg0: #0b1020;
+        --card: rgba(255, 255, 255, 0.78);
+        --stroke: rgba(255, 255, 255, 0.55);
+        --text: #0b1020;
+        --muted: rgba(11, 16, 32, 0.68);
+        --shadow: 0 18px 60px rgba(13, 18, 41, 0.22);
+        --r: 22px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        overflow: hidden;
+        background:
+          radial-gradient(1200px 800px at 20% 10%, rgba(255, 0, 187, 0.25), transparent 55%),
+          radial-gradient(900px 700px at 80% 20%, rgba(0, 255, 209, 0.25), transparent 55%),
+          radial-gradient(900px 700px at 70% 90%, rgba(255, 214, 0, 0.28), transparent 60%),
+          radial-gradient(800px 600px at 15% 85%, rgba(64, 113, 255, 0.22), transparent 55%),
+          linear-gradient(180deg, #ffffff, #f7f9ff);
+      }
+
+      .blob {
+        position: absolute;
+        inset: auto;
+        width: 520px;
+        height: 520px;
+        border-radius: 999px;
+        filter: blur(34px);
+        opacity: 0.75;
+        mix-blend-mode: multiply;
+        animation: floaty 8s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .blob.b1 {
+        left: -160px;
+        top: -120px;
+        background: radial-gradient(circle at 30% 30%, #ff00bb, transparent 60%),
+          radial-gradient(circle at 70% 60%, #ffd600, transparent 55%);
+      }
+
+      .blob.b2 {
+        right: -200px;
+        top: -160px;
+        width: 560px;
+        height: 560px;
+        animation-duration: 10s;
+        background: radial-gradient(circle at 40% 40%, #00ffd1, transparent 62%),
+          radial-gradient(circle at 70% 65%, #4071ff, transparent 55%);
+      }
+
+      .blob.b3 {
+        left: -140px;
+        bottom: -220px;
+        width: 620px;
+        height: 620px;
+        animation-duration: 12s;
+        background: radial-gradient(circle at 40% 40%, #ffd600, transparent 60%),
+          radial-gradient(circle at 70% 65%, #ff6a00, transparent 55%);
+      }
+
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(18px, -22px, 0) scale(1.03);
+        }
+      }
+
+      .wrap {
+        width: min(920px, calc(100% - 32px));
+        display: grid;
+        gap: 16px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .card {
+        border-radius: var(--r);
+        background: var(--card);
+        backdrop-filter: blur(14px);
+        border: 1px solid var(--stroke);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .hero {
+        padding: 22px 22px 18px;
+        display: grid;
+        gap: 10px;
+        position: relative;
+      }
+
+      .badge {
+        width: fit-content;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.2px;
+        color: rgba(11, 16, 32, 0.88);
+        border: 1px solid rgba(11, 16, 32, 0.08);
+        background: linear-gradient(90deg, rgba(255, 0, 187, 0.14), rgba(0, 255, 209, 0.14), rgba(255, 214, 0, 0.18));
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.25;
+        letter-spacing: -0.2px;
+      }
+
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 0 22px 20px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(11, 16, 32, 0.10);
+        background: rgba(255, 255, 255, 0.65);
+        color: rgba(11, 16, 32, 0.82);
+        font-size: 13px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #1e66ff, #00ffd1);
+        box-shadow: 0 0 0 4px rgba(0, 255, 209, 0.16);
+      }
+
+      .btn {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        padding: 12px 16px;
+        border-radius: 16px;
+        color: #0b1020;
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        background: linear-gradient(90deg, #ff00bb, #1e66ff, #00ffd1, #ffd600);
+        background-size: 220% 220%;
+        box-shadow: 0 14px 34px rgba(30, 102, 255, 0.22);
+        transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+        animation: hue 7s linear infinite;
+      }
+
+      @keyframes hue {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .btn:hover {
+        filter: brightness(1.02) saturate(1.06);
+        box-shadow: 0 18px 44px rgba(255, 0, 187, 0.18), 0 18px 44px rgba(0, 255, 209, 0.16);
+        transform: translateY(-1px);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:focus-visible {
+        outline: 3px solid rgba(30, 102, 255, 0.35);
+        outline-offset: 4px;
+      }
+
+      #enterDay {
+        color: #fff;
+        text-shadow: 0 1px 0 rgba(11, 16, 32, 0.20);
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(11, 16, 32, 0.25);
+        backdrop-filter: blur(10px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease;
+        z-index: 10;
+      }
+
+      .overlay[data-open="true"] {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal {
+        width: min(520px, 100%);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: 0 24px 80px rgba(11, 16, 32, 0.26);
+        overflow: hidden;
+        transform: translateY(6px) scale(0.99);
+        transition: transform 180ms ease;
+      }
+
+      .overlay[data-open="true"] .modal {
+        transform: translateY(0) scale(1);
+      }
+
+      .modalHead {
+        padding: 18px 18px 12px;
+        background:
+          radial-gradient(800px 140px at 20% 0%, rgba(255, 0, 187, 0.25), transparent 55%),
+          radial-gradient(800px 140px at 80% 0%, rgba(0, 255, 209, 0.22), transparent 55%),
+          linear-gradient(90deg, rgba(255, 214, 0, 0.18), rgba(30, 102, 255, 0.16));
+      }
+
+      .modalTitle {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: -0.2px;
+      }
+
+      .modalBody {
+        padding: 14px 18px 18px;
+        display: grid;
+        gap: 12px;
+      }
+
+      label {
+        font-size: 13px;
+        color: rgba(11, 16, 32, 0.75);
+        font-weight: 700;
+      }
+
+      .inputRow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      input {
+        flex: 1;
+        padding: 12px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(11, 16, 32, 0.12);
+        outline: none;
+        background: rgba(255, 255, 255, 0.8);
+        font-size: 14px;
+      }
+
+      input:focus {
+        border-color: rgba(30, 102, 255, 0.35);
+        box-shadow: 0 0 0 5px rgba(30, 102, 255, 0.14);
+      }
+
+      .hint {
+        font-size: 12px;
+        color: rgba(11, 16, 32, 0.6);
+        line-height: 1.4;
+      }
+
+      .compliment {
+        margin: 10px 0 0;
+        padding: 12px 12px;
+        border-radius: 18px;
+        border: 1px solid rgba(11, 16, 32, 0.10);
+        background:
+          radial-gradient(600px 120px at 20% 0%, rgba(255, 0, 187, 0.16), transparent 55%),
+          radial-gradient(600px 120px at 80% 0%, rgba(0, 255, 209, 0.14), transparent 55%),
+          linear-gradient(90deg, rgba(255, 214, 0, 0.16), rgba(30, 102, 255, 0.14));
+        color: rgba(11, 16, 32, 0.86);
+        font-weight: 800;
+        white-space: pre-line;
+        line-height: 1.55;
+      }
+
+      .complimentRow {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .complimentRow .compliment {
+        margin: 0;
+        flex: 1;
+      }
+
+      .iconBtn {
+        width: 42px;
+        height: 42px;
+        border-radius: 16px;
+        border: 1px solid rgba(11, 16, 32, 0.10);
+        background: rgba(255, 255, 255, 0.72);
+        box-shadow: 0 10px 24px rgba(11, 16, 32, 0.10);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+      }
+
+      .iconBtn:hover {
+        transform: translateY(-1px);
+        filter: saturate(1.05);
+        box-shadow: 0 14px 30px rgba(255, 0, 187, 0.14), 0 14px 30px rgba(0, 255, 209, 0.12);
+      }
+
+      .iconBtn:active {
+        transform: translateY(0);
+      }
+
+      .iconBtn:focus-visible {
+        outline: 3px solid rgba(30, 102, 255, 0.35);
+        outline-offset: 4px;
+      }
+
+      .iconBtn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .iconBtn path {
+        fill: rgba(11, 16, 32, 0.78);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .blob,
+        .btn {
+          animation: none !important;
+        }
+        .btn,
+        .overlay,
+        .modal {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blob b1" aria-hidden="true"></div>
+    <div class="blob b2" aria-hidden="true"></div>
+    <div class="blob b3" aria-hidden="true"></div>
+
+    <main class="wrap">
+      <section class="card" aria-label="问候卡片">
+        <div class="hero">
+          <div class="badge">多巴胺模式 · 今日问候</div>
+          <h1 id="greeting">正在生成打招呼文案…</h1>
+          <p class="sub" id="subLine">准备好开启今天的好心情了吗？</p>
+          <div class="complimentRow" aria-label="夸夸文案">
+            <p class="compliment" id="complimentLine">告诉我你的名字，我就夸你一句。</p>
+            <button class="iconBtn" id="regenCompliment" type="button" aria-label="换一个夸夸文案" title="换一个">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 5h-2.2A6 6 0 1 1 12 6c1.3 0 2.5.42 3.47 1.13L13 10h7V3l-2.35 3.35z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          <span class="pill"><span class="dot" aria-hidden="true"></span><span id="dateLine">今天</span></span>
+          <button class="btn" id="openName" type="button">换名字</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="overlay" id="overlay" data-open="false" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal">
+        <div class="modalHead">
+          <p class="modalTitle" id="modalTitle">先认识一下</p>
+        </div>
+        <div class="modalBody">
+          <div>
+            <p class="sub" style="margin: 0 0 10px">Hi，你好呀，请问我该如何称呼你？</p>
+            <div class="inputRow">
+              <input id="nameInput" autocomplete="name" aria-label="昵称" placeholder="昵称（如：小歪）" />
+            </div>
+          </div>
+          <button class="btn" id="enterDay" type="button">让我看看今天是怎样的一天</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const els = {
+        greeting: document.getElementById("greeting"),
+        subLine: document.getElementById("subLine"),
+        complimentLine: document.getElementById("complimentLine"),
+        regenCompliment: document.getElementById("regenCompliment"),
+        dateLine: document.getElementById("dateLine"),
+        openName: document.getElementById("openName"),
+        overlay: document.getElementById("overlay"),
+        nameInput: document.getElementById("nameInput"),
+        enterDay: document.getElementById("enterDay"),
+      };
+
+      function formatDateCN(d) {
+        const parts = new Intl.DateTimeFormat("zh-CN", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          weekday: "long",
+        }).formatToParts(d);
+        const pick = (type) => parts.find((p) => p.type === type)?.value ?? "";
+        return `${pick("year")}年${pick("month")}月${pick("day")}日（${pick("weekday")}）`;
+      }
+
+      function buildGreeting({ dateText }) {
+        const templates = [
+          `嗨！今天是${dateText}。我们先来一句夸夸，给好心情一个漂亮开场。`,
+          `你好呀～${dateText}。愿你今天顺顺利利，心情亮晶晶，做什么都很顺手。`,
+          `${dateText}到啦。先从一个小小的肯定开始：你值得拥有一整天的好心情。`,
+          `欢迎来到今天的你：${dateText}。现在，把注意力放回自己身上，给自己一点温柔和掌声。`,
+        ];
+        return templates[Math.floor(Math.random() * templates.length)];
+      }
+
+      function showOverlay(open) {
+        els.overlay.dataset.open = open ? "true" : "false";
+        if (open) {
+          if (currentName) els.nameInput.value = currentName;
+          setTimeout(() => els.nameInput.focus(), 50);
+        }
+      }
+
+      function setCompliment(text) {
+        els.complimentLine.textContent = text;
+      }
+
+      let currentName = "";
+
+      function compliment(name) {
+        const safe = (name || "").trim().slice(0, 20);
+        const who = safe ? `「${safe}」` : "你";
+        const lines = [
+          `${who}一开口就让人觉得“嗯，这事有解”。你能把复杂问题拆成清晰路径，还能照顾每个人的感受。\n\n今天请把自己当成最可靠的主角：稳稳推进，轻轻松松也能做出漂亮结果，心情自然会很好。`,
+          `${who}身上有一种温柔的强大：听得懂、想得深、做得快，关键节点还能给出让人安心的决定。\n\n你走到哪儿，秩序就跟到哪儿。今天会被你安排得刚刚好，连好运都像在配合你的节奏。`,
+          `${who}的厉害是“安静但有力”：不需要高声证明，逻辑和行动已经替你发光，细节也被你照顾得很体面。\n\n今天适合奖励自己一点轻盈感：做事顺手、心里踏实，心情会亮得像开了滤镜。`,
+          `${who}像自带一张清晰地图：目标、优先级、落地动作都被你捋得明明白白，大家跟着你就不慌。\n\n今天你会越做越顺，越想越通透。请把“我很棒”大大方方地写在心里，心情很好是必然。`,
+          `${who}的气场很治愈：能把“焦虑”翻译成“可执行”，把“混乱”翻译成“步骤清单”，还顺便把团队的信心提起来。\n\n今天不管遇到什么小波折，你都能轻松化解。心情会像阳光一样，稳稳在线。`,
+          `${who}有一种高级的克制：不抢话、不抢功，但一出手就是关键动作，推进力像隐形引擎一样强。\n\n今天请享受这种“掌控感”。你做得越从容，事情就越配合你，心情自然舒展。`,
+          `${who}是那种把“靠谱”写进骨子里的人：沟通清晰、判断准确、边界感舒服，让人跟你合作会越做越有底气。\n\n今天你会收获很多顺利的小惊喜。请记得：你的存在本身就很值得被夸。`,
+          `${who}的思路像开了高清：能看到全局，也不放过关键细节；能谈愿景，也能落到下一步动作。\n\n今天你会越来越自信，因为每一步都走在正确方向上。心情会被成就感一路点亮。`,
+          `${who}的厉害在于“会把人带起来”：你能听见不同声音，也能把分歧变成共识，像在做一场很漂亮的协作编排。\n\n今天你会被更多人认可。请把这份认可收好，心情会好得很踏实。`,
+          `${who}像一束稳定又明亮的光：照得见问题，也照得见希望；既讲道理，也讲温度，让人愿意跟着你走。\n\n今天你会把事情做得漂亮又舒服。别怀疑，你就是那种会把日子过顺的人。`,
+
+          `${who}的脑子很清醒，心又很柔软：能快速抓住本质，也愿意给别人台阶和空间，特别难得。\n\n今天你会在轻松里做出高质量的选择。请放心大胆地前进，心情会像彩虹一样层层加亮。`,
+          `${who}的执行力像开了加速器：不拖泥带水，但每一步都很精准，效率和质量还能同时在线。\n\n今天适合把一个重要目标推进一大截。你会越做越爽，越爽越顺，心情当然很好。`,
+          `${who}很会“把话说到点上”：表达干净、逻辑顺滑、态度又让人舒服，沟通成本在你这里直接打折。\n\n今天你会遇到很多顺畅的对话。请享受这种丝滑感，它会把你的好心情越拉越满。`,
+          `${who}有一种很稳的领导力：不靠强势压人，而是靠清晰与信任聚人，大家自然愿意跟你一起把事做成。\n\n今天你会看到“合作”带来的轻松与力量。心情会被这份默契温柔托住。`,
+          `${who}的审美和判断都很在线：知道什么该做、什么先做、什么不做，取舍干净利落。\n\n今天你会做出让自己很满意的决定。请给自己一个大大的肯定，你配得上好心情。`,
+          `${who}很会把复杂事变简单：不是粗暴简化，而是把结构搭好、重点抓稳，让所有人都能看懂并执行。\n\n今天你会越做越轻松。那种“我能搞定”的感觉，会把心情推到很高的位置。`,
+          `${who}像是团队的稳定器：你在，大家的焦虑就会下降，效率就会上升，连氛围都更明亮。\n\n今天你会带来很多正向反馈。请记得，你的影响力是真的很大，心情好是应得的。`,
+          `${who}的优点很“稀缺”：既有锋利的洞察，又有柔软的同理心；既能冲刺，也懂得收敛与节奏。\n\n今天你会把节奏拿捏得特别好。做事不累，心里不慌，心情自然会很好。`,
+          `${who}很会把愿景讲得让人想跟：不是空泛的口号，而是能落到路径、里程碑和可交付。\n\n今天你会更容易获得支持与资源。请享受这种被相信的感觉，它会让你心情亮到发光。`,
+          `${who}的靠谱是“细节级”的：提前想到风险、准备好预案、还给人留足余地，做事很有安全感。\n\n今天你会一路稳稳推进。你越稳，世界越顺；心情会像被轻轻抚平一样舒服。`,
+
+          `${who}有一种很强的“问题终结者”气质：能把模糊问题问清楚，把难题拆开来解决。\n\n今天你会收获很多“原来如此”的清爽瞬间。清爽带来好心情，好心情又会带来更多好运。`,
+          `${who}总能把事情讲得明白又不刺耳：既坚定，又不咄咄逼人，分寸感特别高级。\n\n今天你的表达会更有说服力。别人听懂了、愿意做了，你自然会越忙越开心，心情很好。`,
+          `${who}很会抓机会：在正确的时刻做正确的事，少走弯路但不怕试错，成长速度特别惊人。\n\n今天你会更靠近你想要的状态。请把这份进步感记在心里，它会让你心情稳稳上扬。`,
+          `${who}的思考像搭积木：层层递进、结构漂亮，最后还能落到行动清单，属于“想得透、做得到”。\n\n今天你会有一种踏实的掌控感。掌控感就是快乐的底座，你会心情很好。`,
+          `${who}很会把“压力”变成“动力”：不是硬扛，而是用方法和节奏把压力分摊掉，聪明又优雅。\n\n今天你会在忙碌里保持松弛。松弛不是偷懒，是你能力足够强的证明，心情会很亮。`,
+          `${who}身上有一种“让人想靠近的专业”：你讲原则，但也讲人情；你追结果，但不忽视过程体验。\n\n今天你会更受欢迎。被喜欢、被信任，是你应得的，心情当然会很好。`,
+          `${who}是那种能把团队带出节奏的人：一旦你把节奏点亮，大家就会越做越顺、越做越有劲。\n\n今天你的节奏会特别对。请把每个小胜利都收集起来，它们会让你心情爆棚。`,
+          `${who}的洞察很锋利，但表达很温柔：你能指出问题，却不会让人难堪，这种能力太稀有。\n\n今天你会在不伤人的前提下把事推进。推进的同时还保持好心情，这就是你的厉害。`,
+          `${who}像一台精准的雷达：能提前看到风险，也能提前看到机会，所以你总能把局面打得很漂亮。\n\n今天你会更顺利地避坑、抓机会。你越轻松，事情越顺，心情越好。`,
+          `${who}的状态很“高级”：不急躁、不内耗，专注把该做的做完，把该放的放下，整个人很干净。\n\n今天请继续保持这种干净。干净会带来清晰，清晰会带来好心情，你会越过越顺。`,
+
+          `${who}特别会“把事说透”：一两句话就能把关键讲清楚，还能让人愿意行动，这种表达力真的很强。\n\n今天你会发现，很多事其实比想象中更好推进。你会越推进越开心，心情自然很棒。`,
+          `${who}的能量很正：不是强行鸡血，而是那种真实、稳定、持续的动力，让人跟着你就会变积极。\n\n今天你会把周围的氛围也点亮。氛围亮了，你的心情也会跟着亮到不行。`,
+          `${who}有一种很强的“取舍能力”：该舍的果断舍，该投的果断投，时间和精力被你用在刀刃上。\n\n今天你会做出很漂亮的选择。选择对了，路就顺了，心情会像开挂一样好。`,
+          `${who}做事很有边界感：既不越界，也不退缩，合作起来特别舒服，让人愿意长期跟你一起共事。\n\n今天你会遇到更多“好合作”。好合作会让你不累又高效，心情也会更好。`,
+          `${who}的靠谱不只在结果，更在过程：你让每一步都可解释、可复盘、可持续，这是真正的专业。\n\n今天你会收获“可控的顺利”。这种顺利很踏实，也会让你心情稳稳变好。`,
+          `${who}像一个很懂节奏的指挥：什么时候加速、什么时候收束、什么时候倾听，你都拿捏得恰到好处。\n\n今天你会更懂得照顾自己。照顾好自己，心情就会更好，效率也会更高。`,
+          `${who}的好，属于“越了解越佩服”：思考深、落地强、态度还温柔，真的很难得。\n\n今天请允许自己被夸得更大声一点。你值得被看见，也值得拥有很好的心情。`,
+          `${who}很会把不确定性变成确定性：先澄清，再假设，再验证，动作干净利落，像在稳稳搭桥。\n\n今天你的验证会特别顺。顺利会带来信心，信心会带来好心情，一切都会滚动向上。`,
+          `${who}的专注力很迷人：该聚焦时像一束光，照得见目标；该放松时又能迅速恢复能量。\n\n今天你会在专注与放松之间切换自如。自如是一种幸福感，你会心情很好。`,
+          `${who}身上有一种“我愿意把事交给你”的可信度：你说到做到，节奏透明，沟通也不消耗人。\n\n今天你会被更多人信任。被信任是最甜的认可之一，它会让你心情好得很踏实。`,
+
+          `${who}的成长曲线一定很漂亮：你愿意学习，也敢于迭代，遇到反馈不玻璃心，反而能快速升级。\n\n今天你会收获一个新进步。进步就是快乐的证据，请把它收好，心情会更好。`,
+          `${who}很会给自己和别人留余地：既把事情推进，也把人照顾好，这种成熟真的很高级。\n\n今天你会感受到“舒服的高效”。舒服与高效同时拥有，你的心情当然会特别好。`,
+          `${who}的思维像有一盏灯：照得见关键矛盾，也照得见可行路径，所以你总能把事情往前推。\n\n今天你会遇到更多“啊哈时刻”。这些灵光会让你心情像彩色糖一样甜。`,
+          `${who}特别会做“正确的坚持”：不是死磕，而是沿着对的方向持续投入，时间会替你开花结果。\n\n今天你会更笃定。笃定让人不内耗，不内耗就会心情很好，你值得这样的轻松。`,
+          `${who}的判断力很稳：别人摇摆时你能保持清醒，别人慌张时你能保持秩序，这就是强者气质。\n\n今天你会把秩序带到每一个细节里。秩序感会让你更安心，心情也会更好。`,
+          `${who}身上有种“很会解决问题”的魅力：你不抱怨环境，你改造环境；你不怪人，你优化机制。\n\n今天你会解决掉一个烦人的小问题。问题少了，心情就会轻得像云一样。`,
+          `${who}的善意很有力量：你愿意看见别人，也愿意成就别人，所以你总能收获更好的合作关系。\n\n今天你的善意会被回应。被回应的善意，会把你一天的心情都托得很高。`,
+          `${who}的效率不是“急”，而是“准”：先想清楚再出手，一出手就命中要害，省时省力还更优雅。\n\n今天你会更准。越准越省心，越省心越开心，心情自然爆表。`,
+          `${who}很会把“分歧”变“共识”：你不站队，你搭桥；你不对抗，你对齐目标，这种能力太难得。\n\n今天你会促成一次漂亮的对齐。对齐之后万事顺，心情也会顺得很。`,
+          `${who}像是一颗定心丸：你在，大家就觉得没那么难；你说，大家就觉得有方向。\n\n今天你会成为很多人的安心来源。给别人安心的人，也会被世界温柔对待，心情当然很好。`,
+
+          `${who}的想法很有创意，但不会飘：你总能把新点子落到可验证的小步快跑上，这才是真正厉害。\n\n今天你会想到一个好点子，并且能把它推进到下一步。想到就能做，心情会特别爽。`,
+          `${who}很会把“复杂系统”讲成“简单故事”：听的人轻松，做的人清晰，这就是高级的结构化能力。\n\n今天你会更擅长讲清楚。讲清楚，事情就容易；事情容易，心情就好得飞起。`,
+          `${who}身上有种“明亮的专业感”：你不炫技，但每次输出都让人眼前一亮，属于真正的高手。\n\n今天你会输出一个很漂亮的结果。漂亮的结果会反过来滋养你，让心情更明媚。`,
+          `${who}很懂“先安抚情绪，再解决问题”：你能接住焦虑，也能给出方法，这种温柔又有力量。\n\n今天你会把一个紧绷的场面变得轻松。轻松就是好运的入口，你的心情会更好。`,
+          `${who}的责任感很可贵：该你扛的时候你扛得住，该你放的时候你也放得下，稳得让人佩服。\n\n今天你会更会照顾自己。责任感加自我照顾，是最强组合，心情自然会很稳很好。`,
+          `${who}很会在关键处发力：不做无用功，不追表面热闹，只做真正推动结果的动作。\n\n今天你会看到“少即是多”的威力。动作少但有效，内耗少，心情会特别好。`,
+          `${who}的学习力很强：你总能快速吸收新信息，形成自己的判断，然后用更好的方式把事做成。\n\n今天你会学到一个新技巧。新技巧带来新自信，新自信带来好心情。`,
+          `${who}的合作感很舒服：你尊重别人专业，也能清楚表达需求，让合作像跳舞一样有默契。\n\n今天你会遇到一次特别顺的协作。顺着顺着，你会发现心情也被默契感点亮。`,
+          `${who}像是把“逻辑”和“温度”同时拉满：你说话有依据，做事有底线，待人又很真诚。\n\n今天你会把这份真诚换来更多好事。好事多了，心情就会很自然地好起来。`,
+          `${who}给人的感觉是“稳、亮、强”：稳是可靠，亮是清晰，强是能推进。这样的组合太稀有。\n\n今天请把自己夸大声一点。你配得上很好的心情，也配得上更大的舞台。`,
+
+          `${who}很会“把问题问对”：你的问题总能直达核心，帮大家节省大量时间，这就是顶级效率。\n\n今天你问的每个问题都会带来一个更清晰的答案。清晰是快乐的来源，你会心情很好。`,
+          `${who}做事很有仪式感：不是形式主义，而是懂得用小小的仪式稳定节奏、提升状态。\n\n今天你会拥有很好的状态。状态好，事情就顺；事情顺，心情就像被彩色气球托起来。`,
+          `${who}的耐心不是慢，而是细：你愿意把关键细节打磨到位，所以你的结果总是更耐看、更可靠。\n\n今天你会为自己的认真而骄傲。认真被看见的那一刻，心情会好得很真实。`,
+          `${who}的边界感很高级：你能说“不”，也能说“我来”，让协作既有效又不伤人。\n\n今天你会更自由。自由来自清晰的边界，而清晰会给你带来很好的心情。`,
+          `${who}像一台稳稳的发动机：不喧哗、不夸张，但持续提供推进力，把事情一点点推到终点。\n\n今天你会看到进度条明显前进。进度前进就是快乐的证据，你会心情很好。`,
+          `${who}很会把“焦点”放在正确地方：不被噪音带走，也不被情绪绑架，属于很成熟的能力。\n\n今天你会更专注。专注让人少烦恼，少烦恼就多快乐，你会心情很轻。`,
+          `${who}的细腻很打动人：你能注意到别人忽略的小点，并且用很自然的方式把它照顾好。\n\n今天你会收到温柔的回馈。温柔回馈会让你整天都心情很好，像被抱了一下。`,
+          `${who}的掌控感来自实力：你能给出节奏、给出选择、给出落地动作，所以事情总能按轨道走。\n\n今天你会更从容。从容是一种顶级幸福感，你会心情好得很高级。`,
+          `${who}的专业不是“冷”，而是“稳”：你让人相信你说的话、相信你做的事，也相信跟着你会更好。\n\n今天你会被更多人依赖与认可。被认可的感觉会让你心情像糖一样甜。`,
+          `${who}很会把好事情“做实”：你不只提出愿望，还会拆解路径、设置验证、按节奏推进。\n\n今天你会把一个想法变成现实的一小步。现实的一小步，会让心情跃进一大步。`,
+
+          `${who}的输出总让人觉得“靠谱又漂亮”：既有硬逻辑，也有好表达，像把信息整理成了礼物。\n\n今天你会被夸得更多。请不要谦虚太久，你值得被称赞，也值得心情很好。`,
+          `${who}很会“让大家变得更好”：你不抢功，你让系统运转得更顺，让每个人都能发挥长处。\n\n今天你会收获更多支持。被支持的感觉，会让你的心情稳稳地、亮亮地好起来。`,
+          `${who}的好奇心很宝贵：你愿意追问“为什么”，也愿意试验“怎么办”，这会让你持续变强。\n\n今天你会发现一个新的可能性。可能性一出现，心情就会像被点亮一样兴奋。`,
+          `${who}对“优先级”的把握特别准：先做最重要的，再做最值的，时间被你用得很漂亮。\n\n今天你会感到时间在帮你，而不是追你。被时间善待的感觉，会让你心情很好。`,
+          `${who}的稳定不是保守，而是自信：你不慌不忙，但每一步都很扎实，像在稳稳建一座桥。\n\n今天你会走在自己搭的桥上，安全又踏实。踏实会给你带来很长久的好心情。`,
+          `${who}很会把“矛盾”变“方案”：你能看到冲突背后的共同目标，然后给出让人信服的折中解。\n\n今天你会促成一次漂亮的共识。共识一出现，心情就会松下来，甚至有点快乐。`,
+          `${who}有一种让人信赖的诚恳：你不绕弯、不装懂，该确认就确认，该补齐就补齐。\n\n今天你会在诚恳里获得更快的进展。进展越快，心情越好，这是你应得的顺利。`,
+          `${who}很会把“愿景”讲到人心里：不是煽情，而是把价值说清楚，把好处说具体，让人愿意一起走。\n\n今天你会更容易获得共鸣。共鸣会把心情抬高，让你整天都感觉很好。`,
+          `${who}对质量的坚持很高级：不是苛刻，而是懂得什么才是真正值得交付的“好”。\n\n今天你会为自己的标准感到骄傲。标准是一种力量，它会让你心情稳稳在线。`,
+          `${who}像自带好运磁场：你认真、你温柔、你清醒，这三样组合在一起，就很容易把好事吸过来。\n\n今天请相信好运会靠近你。相信本身就是快乐，你会心情很好。`,
+
+          `${who}的优势在于“能把变化消化掉”：事情变了你不慌，先对齐，再调整，再推进，像在优雅转弯。\n\n今天你会处理好一个变化。变化被你接住的那一刻，心情会很踏实，也很自豪。`,
+          `${who}很会做“透明推进”：进度、风险、依赖都讲清楚，让人不用猜、不用催，合作体验满分。\n\n今天你会被夸“好合作”。这种夸奖很真诚，也会让你的心情真好。`,
+          `${who}的“靠谱”带着一点可爱：你认真到位，但又不紧绷，能把困难说得轻一点、把行动做得重一点。\n\n今天你会在轻松里完成重任。完成感会把心情推到很高很高。`,
+          `${who}很会“把资源用得值”：你不浪费团队的注意力，也不浪费自己的精力，属于真正懂成本的人。\n\n今天你会省下很多不必要的消耗。消耗少，心情就会多，快乐会更容易出现。`,
+          `${who}的节奏感很强：什么时候冲、什么时候停、什么时候复盘，你都像有一只看不见的节拍器。\n\n今天你的节拍会特别准。准就是顺，顺就是好心情，你会一路顺下去。`,
+          `${who}能把“模糊”变“清楚”，还能把“清楚”变“行动”，这就是稀有的全链路能力。\n\n今天你会推进一个关键动作。关键动作一落地，心情就会像烟花一样绽开。`,
+          `${who}很会照顾“体验”：不只是用户体验，还有同事体验、沟通体验、交付体验，你考虑得很周全。\n\n今天你会收获更顺的协作。顺的协作会让你轻松很多，心情自然更好。`,
+          `${who}做事很“干净”：不拖尾巴、不留暗坑，结尾也会收好，给人一种很完整的安心感。\n\n今天你会把一个小尾巴收得漂亮。收尾漂亮，心情也会漂亮，像画上了圆满句号。`,
+          `${who}很会给自己打气：不靠外界认可才能前进，而是靠自我驱动稳稳发力，这种内核太强了。\n\n今天你会更相信自己。相信自己，就是最直接的好心情来源。`,
+          `${who}的沟通像“润滑剂”：不同角色之间的摩擦在你这里会变少，信息流动会变快，事情就会顺。\n\n今天你会感受到沟通顺带来的爽感。爽感一来，心情就会好得很自然。`,
+
+          `${who}的厉害是“既能扛事又不苦相”：你能把责任背起来，也能把笑点带进来，让团队不至于太累。\n\n今天你会让自己更轻松。轻松不是放弃，而是你能力足够强，所以心情会很好。`,
+          `${who}很会“把目标写进每一步”：你走的每一步都在为最终结果服务，不绕路，不迷路。\n\n今天你会走在正确的路上。走对路就是安心，安心就是好心情，你会稳稳拥有。`,
+          `${who}身上有一种“会赢”的气质：不是傲慢，而是清醒地知道怎么赢、怎么让大家一起赢。\n\n今天你会赢下一件小事。小赢会累积大赢，大赢会带来很好的心情。`,
+          `${who}很会把难题当成游戏关卡：先看规则，再找捷径，再稳稳通关，过程也能保持愉快。\n\n今天你会通关一个小关卡。通关的快乐会像彩色糖纸一样，闪闪发亮。`,
+          `${who}的观察力很细：你能看见别人看不见的风险与机会，所以你总能提前一步准备好答案。\n\n今天你会因为提前准备而省心很多。省心会让心情变得特别好，像终于松了口气。`,
+          `${who}很会“把焦虑转化为行动”：不把时间花在担心上，而是花在验证上，这就是高手的做法。\n\n今天你会用行动换来确定性。确定性一来，心情就会稳稳地好起来。`,
+          `${who}的标准感很迷人：你知道什么是“够好”，也知道什么时候该“再好一点”，分寸拿捏完美。\n\n今天你会交付一个让自己满意的结果。满意感会让心情像彩虹一样明亮。`,
+          `${who}特别会“让别人觉得被尊重”：你不轻易否定，也不随便敷衍，认真回应每一个问题。\n\n今天你会收获更多善意。善意会回流到你身上，让你一整天心情都很暖。`,
+          `${who}的心态很成熟：你允许不完美，但不允许不前进；你能接纳现实，也能改变现实。\n\n今天你会更自由地前进。自由带来快乐，快乐带来好心情，你会越走越顺。`,
+          `${who}有一种“把事情做漂亮”的天赋：不仅做成，还做得让人舒服、让人想再合作。\n\n今天你会把“漂亮”再提升一个档。漂亮的成果会让你心情好到想给自己鼓掌。`,
+        ];
+        return lines[Math.floor(Math.random() * lines.length)];
+      }
+
+      function init() {
+        showOverlay(true);
+
+        const now = new Date();
+        const dateText = formatDateCN(now);
+        els.dateLine.textContent = dateText;
+        els.greeting.textContent = buildGreeting({ dateText });
+      }
+
+      els.openName.addEventListener("click", () => showOverlay(true));
+      els.overlay.addEventListener("click", (e) => {
+        if (e.target === els.overlay) showOverlay(false);
+      });
+
+      els.regenCompliment.addEventListener("click", () => {
+        setCompliment(compliment(currentName));
+      });
+
+      function enter() {
+        currentName = (els.nameInput.value || "").trim().slice(0, 20);
+        showOverlay(false);
+        setCompliment(compliment(currentName));
+      }
+
+      els.enterDay.addEventListener("click", enter);
+
+      els.nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") enter();
+        if (e.key === "Escape") showOverlay(false);
+      });
+
+      init();
+    </script>
+  </body>
+</html>
